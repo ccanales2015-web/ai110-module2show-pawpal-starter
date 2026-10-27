@@ -96,7 +96,7 @@ class Scheduler:
         self, entries: list[tuple[Pet, Task]]
     ) -> list[tuple[Pet, Task]]:
         """Return entries ordered by scheduled date and time."""
-        pass
+        return sorted(entries, key=lambda entry: entry[1].scheduled_at)
 
     def filter_tasks(
         self,
