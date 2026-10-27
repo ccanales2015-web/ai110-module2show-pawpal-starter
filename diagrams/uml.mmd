@@ -1,15 +1,47 @@
 classDiagram
-    %% Replace the placeholders below with your actual classes, attributes, methods, and relationships.
-    %% Keep this file updated so it matches your final implementation.
+    %% PawPal+ approved Phase 1 design. Keep this file updated so it matches the final implementation.
 
-    class ClassName {
-        +type attribute
-        +method() returnType
+    class Owner {
+        +name: str
+        +pets: list~Pet~
+        +add_pet(pet: Pet) None
+        +get_all_tasks() list~tuple~Pet, Task~~
     }
 
-    class AnotherClass {
-        +type attribute
-        +method() returnType
+    class Pet {
+        <<dataclass>>
+        +name: str
+        +species: str
+        +tasks: list~Task~
+        +add_task(task: Task) None
+        +get_tasks() list~Task~
     }
 
-    ClassName --> AnotherClass : relationship
+    class Task {
+        <<dataclass eq=False>>
+        +description: str
+        +scheduled_at: datetime
+        +frequency: str = "none"
+        +priority: str = "medium"
+        +completed: bool = False
+        -__post_init__() None
+        +mark_complete() None
+        +next_occurrence() Optional~Task~
+    }
+
+    class Scheduler {
+        +owner: Owner
+        +sort_by_time(entries: list~tuple~Pet, Task~~) list~tuple~Pet, Task~~
+        +filter_tasks(pet_name: Optional~str~, completed: Optional~bool~) list~tuple~Pet, Task~~
+        +detect_conflicts(entries: list~tuple~Pet, Task~~) list~str~
+        +mark_task_complete(pet: Pet, task: Task) Optional~Task~
+        +get_daily_schedule(day: date) list~tuple~Pet, Task~~
+        +explain_plan(day: date) str
+    }
+
+    Owner "1" o-- "0..*" Pet : owns
+    Pet "1" *-- "0..*" Task : has
+    Scheduler "1" --> "1" Owner : schedules for
+
+    note for Task "frequency: none | daily | weekly\npriority: low | medium | high\n__post_init__ raises ValueError (case-sensitive)\nnext_occurrence: none -> None, daily +1 day, weekly +7 days"
+    note for Scheduler "mark_task_complete: ValueError if task not in pet.tasks (identity);\nalready completed -> returns None, no changes\ndetect_conflicts: pending tasks only, identical scheduled_at\nget_daily_schedule: completed + pending, chronological"
