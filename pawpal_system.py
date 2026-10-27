@@ -127,7 +127,17 @@ class Scheduler:
 
     def mark_task_complete(self, pet: Pet, task: Task) -> Optional[Task]:
         """Complete a pet's task and return its next occurrence, if any."""
-        pass
+        if not any(existing is task for existing in pet.get_tasks()):
+            raise ValueError(
+                f"Task {task.description!r} does not belong to pet {pet.name!r}"
+            )
+        if task.completed:
+            return None
+        task.mark_complete()
+        next_task = task.next_occurrence()
+        if next_task is not None:
+            pet.add_task(next_task)
+        return next_task
 
     def get_daily_schedule(self, day: date) -> list[tuple[Pet, Task]]:
         """Return all tasks for the given day, completed and pending, in time order."""
