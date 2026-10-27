@@ -22,8 +22,11 @@ I separated these responsibilities to keep the design modular and avoid duplicat
 
 **b. Design changes**
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
+Yes. During the initial Python scaffolding, I decided to implement the `Owner` and `Scheduler` classes as dataclasses, alongside `Pet` and `Task`.
+
+This allowed Python to generate their constructors automatically, reducing boilerplate code while preserving the responsibilities and relationships established in the original design.
+
+I subsequently updated the UML diagram to identify `Owner` and `Scheduler` as dataclasses, keeping the diagram consistent with the Python implementation. The overall four-class architecture remained unchanged.
 
 ---
 
