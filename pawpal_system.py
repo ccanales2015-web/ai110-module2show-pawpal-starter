@@ -104,7 +104,12 @@ class Scheduler:
         completed: Optional[bool] = None,
     ) -> list[tuple[Pet, Task]]:
         """Return the owner's tasks filtered by pet name and/or completion status."""
-        pass
+        return [
+            (pet, task)
+            for pet, task in self.owner.get_all_tasks()
+            if (pet_name is None or pet.name == pet_name)
+            and (completed is None or task.completed == completed)
+        ]
 
     def detect_conflicts(self, entries: list[tuple[Pet, Task]]) -> list[str]:
         """Return warnings for pending tasks that share an identical scheduled time."""
