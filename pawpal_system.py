@@ -151,4 +151,26 @@ class Scheduler:
 
     def explain_plan(self, day: date) -> str:
         """Explain the day's ordering, priority labels, and exact-time conflicts."""
-        pass
+        entries = self.get_daily_schedule(day)
+        if not entries:
+            return f"Plan for {day:%Y-%m-%d}\nNo tasks are scheduled for this day."
+        lines = [
+            f"Plan for {day:%Y-%m-%d}",
+            "Tasks are listed in order of scheduled time. "
+            "Priority labels are informational and do not change the order.",
+            "",
+        ]
+        for pet, task in entries:
+            status = "completed" if task.completed else "pending"
+            lines.append(
+                f"  {task.scheduled_at:%H:%M}  {task.description} ({pet.name})"
+                f" - {task.priority} priority, {status}"
+            )
+        conflicts = self.detect_conflicts(entries)
+        lines.append("")
+        if conflicts:
+            lines.append("Exact-time conflicts (pending tasks only):")
+            lines.extend(f"  - {warning}" for warning in conflicts)
+        else:
+            lines.append("No exact-time conflicts detected.")
+        return "\n".join(lines)
