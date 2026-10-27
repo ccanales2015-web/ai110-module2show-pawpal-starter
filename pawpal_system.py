@@ -141,7 +141,13 @@ class Scheduler:
 
     def get_daily_schedule(self, day: date) -> list[tuple[Pet, Task]]:
         """Return all tasks for the given day, completed and pending, in time order."""
-        pass
+        return self.sort_by_time(
+            [
+                (pet, task)
+                for pet, task in self.owner.get_all_tasks()
+                if task.scheduled_at.date() == day
+            ]
+        )
 
     def explain_plan(self, day: date) -> str:
         """Explain the day's ordering, priority labels, and exact-time conflicts."""
