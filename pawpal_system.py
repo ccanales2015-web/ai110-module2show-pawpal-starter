@@ -34,7 +34,7 @@ class Task:
 
     def mark_complete(self) -> None:
         """Mark this task as completed."""
-        pass
+        self.completed = True
 
     def next_occurrence(self) -> Optional[Task]:
         """Return the next occurrence of a recurring task, or None."""
