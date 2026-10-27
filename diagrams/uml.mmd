@@ -2,6 +2,7 @@ classDiagram
     %% PawPal+ approved Phase 1 design. Keep this file updated so it matches the final implementation.
 
     class Owner {
+        <<dataclass>>
         +name: str
         +pets: list~Pet~
         +add_pet(pet: Pet) None
@@ -30,6 +31,7 @@ classDiagram
     }
 
     class Scheduler {
+        <<dataclass>>
         +owner: Owner
         +sort_by_time(entries: list~tuple~Pet, Task~~) list~tuple~Pet, Task~~
         +filter_tasks(pet_name: Optional~str~, completed: Optional~bool~) list~tuple~Pet, Task~~
