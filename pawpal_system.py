@@ -40,11 +40,11 @@ class Pet:
 
     def add_task(self, task: Task) -> None:
         """Add a task to this pet."""
-        pass
+        self.tasks.append(task)
 
     def get_tasks(self) -> list[Task]:
         """Return this pet's tasks."""
-        pass
+        return self.tasks
 
 
 @dataclass
