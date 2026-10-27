@@ -44,14 +44,32 @@ pip install -r requirements.txt
 
 ## 🖥️ Sample Output
 
-Paste a sample of your app's CLI or Streamlit output here so a reader can see what a generated plan looks like:
+Output of `python main.py`, which builds one owner, two pets, and three tasks for October 27, 2026:
 
-```
-# e.g.:
-# Daily plan for Biscuit (Golden Retriever):
-#   08:00 — Morning walk (30 min) [priority: high]
-#   09:00 — Feeding (10 min) [priority: high]
-#   ...
+```text
+=== Initial schedule ===
+Plan for 2026-10-27
+Tasks are listed in order of scheduled time. Priority labels are informational and do not change the order.
+
+  08:00  Morning walk (Rex) - high priority, pending
+  08:00  Breakfast (Mochi) - medium priority, pending
+  19:00  Brush fur (Mochi) - low priority, pending
+
+Exact-time conflicts (pending tasks only):
+  - Conflict at 2026-10-27 08:00: Morning walk (Rex), Breakfast (Mochi)
+
+=== After completing Rex's morning walk ===
+Plan for 2026-10-27
+Tasks are listed in order of scheduled time. Priority labels are informational and do not change the order.
+
+  08:00  Morning walk (Rex) - high priority, completed
+  08:00  Breakfast (Mochi) - medium priority, pending
+  19:00  Brush fur (Mochi) - low priority, pending
+
+No exact-time conflicts detected.
+
+=== Next occurrence ===
+Morning walk (Rex) is next scheduled for 2026-10-28 08:00 (daily, high priority)
 ```
 
 ## 🧪 Testing PawPal+
