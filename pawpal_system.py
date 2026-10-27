@@ -56,7 +56,7 @@ class Owner:
 
     def add_pet(self, pet: Pet) -> None:
         """Add a pet to this owner."""
-        pass
+        self.pets.append(pet)
 
     def get_all_tasks(self) -> list[tuple[Pet, Task]]:
         """Return every task across all pets as (pet, task) pairs."""
