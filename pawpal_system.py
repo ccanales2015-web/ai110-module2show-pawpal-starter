@@ -60,7 +60,7 @@ class Owner:
 
     def get_all_tasks(self) -> list[tuple[Pet, Task]]:
         """Return every task across all pets as (pet, task) pairs."""
-        pass
+        return [(pet, task) for pet in self.pets for task in pet.get_tasks()]
 
 
 @dataclass
