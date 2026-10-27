@@ -42,6 +42,9 @@ st.divider()
 
 st.subheader("Quick Demo Inputs (UI only)")
 owner_name = st.text_input("Owner name", value="Jordan")
+if "owner" not in st.session_state:
+    st.session_state.owner = Owner(owner_name)
+st.session_state.owner.name = owner_name
 pet_name = st.text_input("Pet name", value="Mochi")
 species = st.selectbox("Species", ["dog", "cat", "other"])
 
