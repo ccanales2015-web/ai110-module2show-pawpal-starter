@@ -48,6 +48,16 @@ st.session_state.owner.name = owner_name
 pet_name = st.text_input("Pet name", value="Mochi")
 species = st.selectbox("Species", ["dog", "cat", "other"])
 
+if st.button("Add pet"):
+    pet = Pet(pet_name, species)
+    st.session_state.owner.add_pet(pet)
+
+if st.session_state.owner.pets:
+    st.write("Current pets:")
+    st.table([{"name": p.name, "species": p.species} for p in st.session_state.owner.pets])
+else:
+    st.info("No pets yet. Add one above.")
+
 st.markdown("### Tasks")
 st.caption("Add a few tasks. In your final version, these should feed into your scheduler.")
 
