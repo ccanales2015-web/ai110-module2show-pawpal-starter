@@ -113,7 +113,17 @@ class Scheduler:
 
     def detect_conflicts(self, entries: list[tuple[Pet, Task]]) -> list[str]:
         """Return warnings for pending tasks that share an identical scheduled time."""
-        pass
+        groups: dict[datetime, list[tuple[Pet, Task]]] = {}
+        for pet, task in entries:
+            if not task.completed:
+                groups.setdefault(task.scheduled_at, []).append((pet, task))
+        warnings = []
+        for when in sorted(groups):
+            group = groups[when]
+            if len(group) > 1:
+                tasks = ", ".join(f"{task.description} ({pet.name})" for pet, task in group)
+                warnings.append(f"Conflict at {when:%Y-%m-%d %H:%M}: {tasks}")
+        return warnings
 
     def mark_task_complete(self, pet: Pet, task: Task) -> Optional[Task]:
         """Complete a pet's task and return its next occurrence, if any."""
