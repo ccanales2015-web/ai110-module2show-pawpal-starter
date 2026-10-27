@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Optional
 
 
@@ -38,7 +38,19 @@ class Task:
 
     def next_occurrence(self) -> Optional[Task]:
         """Return the next occurrence of a recurring task, or None."""
-        pass
+        if self.frequency == "daily":
+            interval = timedelta(days=1)
+        elif self.frequency == "weekly":
+            interval = timedelta(days=7)
+        else:
+            return None
+        return Task(
+            description=self.description,
+            scheduled_at=self.scheduled_at + interval,
+            frequency=self.frequency,
+            priority=self.priority,
+            completed=False,
+        )
 
 
 @dataclass
