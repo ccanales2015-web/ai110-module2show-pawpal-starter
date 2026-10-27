@@ -19,7 +19,18 @@ class Task:
 
     def __post_init__(self) -> None:
         """Validate frequency and priority values."""
-        pass
+        valid_frequencies = ("none", "daily", "weekly")
+        valid_priorities = ("low", "medium", "high")
+        if self.frequency not in valid_frequencies:
+            raise ValueError(
+                f"Invalid frequency {self.frequency!r}; "
+                f"expected one of {valid_frequencies}"
+            )
+        if self.priority not in valid_priorities:
+            raise ValueError(
+                f"Invalid priority {self.priority!r}; "
+                f"expected one of {valid_priorities}"
+            )
 
     def mark_complete(self) -> None:
         """Mark this task as completed."""
