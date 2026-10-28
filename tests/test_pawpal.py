@@ -165,3 +165,26 @@ def test_completing_already_completed_recurring_task_is_a_no_op():
     assert scheduler.mark_task_complete(rex, brushing) is None
     assert rex.get_tasks() == [brushing, next_brushing]
     assert next_brushing.completed is False
+
+
+def test_sort_by_time_returns_entries_in_chronological_order():
+    owner = Owner("Jordan")
+    rex = Pet("Rex", "dog")
+    mochi = Pet("Mochi", "cat")
+    owner.add_pet(rex)
+    owner.add_pet(mochi)
+    dinner = Task("Dinner", datetime(2026, 10, 27, 18, 0))
+    vet = Task("Vet visit", datetime(2026, 10, 28, 7, 0))
+    walk = Task("Walk", datetime(2026, 10, 27, 8, 0))
+    meds = Task("Meds", datetime(2026, 10, 27, 12, 30))
+    rex.add_task(dinner)
+    rex.add_task(walk)
+    mochi.add_task(vet)
+    mochi.add_task(meds)
+    entries = [(rex, dinner), (mochi, vet), (rex, walk), (mochi, meds)]
+    original = list(entries)
+
+    sorted_entries = Scheduler(owner).sort_by_time(entries)
+
+    assert sorted_entries == [(rex, walk), (mochi, meds), (rex, dinner), (mochi, vet)]
+    assert entries == original

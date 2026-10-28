@@ -103,26 +103,32 @@ All completed tasks (completed=True):
 
 ```bash
 # Run the full test suite:
-python -m pytest -v
+python -m pytest
 ```
 
-Sample test output (machine-specific header and timing omitted):
+Add `-v` to list each test by name.
+
+The tests in `tests/test_pawpal.py` cover:
+
+- **Task basics:** marking a task complete and adding tasks to a pet.
+- **Chronological sorting:** `sort_by_time()` returns out-of-order `(pet, task)` pairs earliest first, including a task on a later day with an earlier time of day, keeps each task paired with its pet, and leaves the input list unchanged.
+- **Daily recurrence:** completing a `daily` task adds a pending copy one day later with the same description, duration, priority, and frequency.
+- **Conflict detection:** overlapping pending tasks for the same pet produce a warning, including tasks with identical start times.
+- **Edge cases:** back-to-back tasks, overlapping tasks for different pets, and completed tasks do not conflict; one-off tasks get no next occurrence; completing a task for the wrong pet raises `ValueError` and changes nothing; completing an already-completed `weekly` task a second time is a no-op.
+
+Sample test output (machine-specific header lines omitted):
 
 ```
-tests/test_pawpal.py::test_mark_complete_changes_task_status PASSED      [  9%]
-tests/test_pawpal.py::test_add_task_increases_pet_task_count PASSED      [ 18%]
-tests/test_pawpal.py::test_same_pet_overlapping_tasks_conflict PASSED    [ 27%]
-tests/test_pawpal.py::test_same_pet_back_to_back_tasks_do_not_conflict PASSED [ 36%]
-tests/test_pawpal.py::test_overlapping_tasks_for_different_pets_do_not_conflict PASSED [ 45%]
-tests/test_pawpal.py::test_completed_task_overlapping_pending_task_does_not_conflict PASSED [ 54%]
-tests/test_pawpal.py::test_same_pet_identical_start_times_conflict PASSED [ 63%]
-tests/test_pawpal.py::test_completing_daily_task_adds_next_occurrence PASSED [ 72%]
-tests/test_pawpal.py::test_completing_one_off_task_does_not_add_occurrence PASSED [ 81%]
-tests/test_pawpal.py::test_completing_task_for_wrong_pet_raises_and_changes_nothing PASSED [ 90%]
-tests/test_pawpal.py::test_completing_already_completed_recurring_task_is_a_no_op PASSED [100%]
+collected 12 items
 
-11 passed
+tests\test_pawpal.py ............                                        [100%]
+
+============================= 12 passed in 0.05s ==============================
 ```
+
+**Confidence level: ★★★★☆ (4/5)**
+
+All 12 tests pass, and they exercise the core scheduling behaviors and their main edge cases. Passing tests do not prove the system is bug-free, though. `filter_tasks()`, `get_daily_schedule()`, `explain_plan()`, `Task` input validation, and the Streamlit UI have no direct automated tests yet.
 
 ## 📐 Smarter Scheduling
 
