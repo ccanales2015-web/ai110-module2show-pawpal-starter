@@ -1,3 +1,5 @@
+from datetime import date, datetime, time
+
 import streamlit as st
 
 from pawpal_system import Owner, Pet, Scheduler, Task
@@ -61,25 +63,54 @@ else:
 st.markdown("### Tasks")
 st.caption("Add a few tasks. In your final version, these should feed into your scheduler.")
 
-if "tasks" not in st.session_state:
-    st.session_state.tasks = []
-
-col1, col2, col3 = st.columns(3)
-with col1:
-    task_title = st.text_input("Task title", value="Morning walk")
-with col2:
-    duration = st.number_input("Duration (minutes)", min_value=1, max_value=240, value=20)
-with col3:
-    priority = st.selectbox("Priority", ["low", "medium", "high"], index=2)
-
-if st.button("Add task"):
-    st.session_state.tasks.append(
-        {"title": task_title, "duration_minutes": int(duration), "priority": priority}
+if not st.session_state.owner.pets:
+    st.info("Add a pet before adding tasks.")
+else:
+    pets = st.session_state.owner.pets
+    pet_index = st.selectbox(
+        "Pet",
+        range(len(pets)),
+        format_func=lambda i: f"{pets[i].name} ({pets[i].species})",
     )
+    selected_pet = pets[pet_index]
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        task_title = st.text_input("Task title", value="Morning walk")
+    with col2:
+        task_date = st.date_input("Date", value=date.today())
+    with col3:
+        task_time = st.time_input("Time", value=time(8, 0))
+    col4, col5 = st.columns(2)
+    with col4:
+        frequency = st.selectbox("Frequency", ["none", "daily", "weekly"])
+    with col5:
+        priority = st.selectbox("Priority", ["low", "medium", "high"], index=2)
 
-if st.session_state.tasks:
+    if st.button("Add task"):
+        task = Task(
+            task_title,
+            datetime.combine(task_date, task_time),
+            frequency=frequency,
+            priority=priority,
+        )
+        selected_pet.add_task(task)
+
+all_tasks = st.session_state.owner.get_all_tasks()
+if all_tasks:
     st.write("Current tasks:")
-    st.table(st.session_state.tasks)
+    st.table(
+        [
+            {
+                "pet": pet.name,
+                "task": task.description,
+                "scheduled": f"{task.scheduled_at:%Y-%m-%d %H:%M}",
+                "frequency": task.frequency,
+                "priority": task.priority,
+                "status": "completed" if task.completed else "pending",
+            }
+            for pet, task in all_tasks
+        ]
+    )
 else:
     st.info("No tasks yet. Add one above.")
 
