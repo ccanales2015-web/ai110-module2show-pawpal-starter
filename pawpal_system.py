@@ -16,9 +16,10 @@ class Task:
     frequency: str = "none"
     priority: str = "medium"
     completed: bool = False
+    duration_minutes: int = 20
 
     def __post_init__(self) -> None:
-        """Validate frequency and priority values."""
+        """Validate frequency, priority, and duration values."""
         valid_frequencies = ("none", "daily", "weekly")
         valid_priorities = ("low", "medium", "high")
         if self.frequency not in valid_frequencies:
@@ -30,6 +31,15 @@ class Task:
             raise ValueError(
                 f"Invalid priority {self.priority!r}; "
                 f"expected one of {valid_priorities}"
+            )
+        if (
+            isinstance(self.duration_minutes, bool)
+            or not isinstance(self.duration_minutes, int)
+            or self.duration_minutes <= 0
+        ):
+            raise ValueError(
+                f"Invalid duration_minutes {self.duration_minutes!r}; "
+                f"expected a positive integer"
             )
 
     def mark_complete(self) -> None:
@@ -50,6 +60,7 @@ class Task:
             frequency=self.frequency,
             priority=self.priority,
             completed=False,
+            duration_minutes=self.duration_minutes,
         )
 
 
@@ -112,18 +123,40 @@ class Scheduler:
         ]
 
     def detect_conflicts(self, entries: list[tuple[Pet, Task]]) -> list[str]:
-        """Return warnings for pending tasks that share an identical scheduled time."""
-        groups: dict[datetime, list[tuple[Pet, Task]]] = {}
+        """Return warnings for overlapping pending tasks that belong to the same pet.
+
+        Each task occupies [scheduled_at, scheduled_at + duration_minutes), so
+        back-to-back tasks do not conflict.
+        """
+        by_pet: dict[int, list[tuple[Pet, Task]]] = {}
         for pet, task in entries:
             if not task.completed:
-                groups.setdefault(task.scheduled_at, []).append((pet, task))
-        warnings = []
-        for when in sorted(groups):
-            group = groups[when]
-            if len(group) > 1:
-                tasks = ", ".join(f"{task.description} ({pet.name})" for pet, task in group)
-                warnings.append(f"Conflict at {when:%Y-%m-%d %H:%M}: {tasks}")
-        return warnings
+                by_pet.setdefault(id(pet), []).append((pet, task))
+
+        def describe(pet: Pet, task: Task, end: datetime) -> str:
+            return (
+                f"{task.description} ({pet.name}, "
+                f"{task.scheduled_at:%H:%M}-{end:%H:%M})"
+            )
+
+        found: list[tuple[datetime, str, str]] = []
+        for group in by_pet.values():
+            group = self.sort_by_time(group)
+            for i, (pet, first) in enumerate(group):
+                first_end = first.scheduled_at + timedelta(minutes=first.duration_minutes)
+                for _, second in group[i + 1:]:
+                    if second.scheduled_at >= first_end:
+                        break
+                    second_end = second.scheduled_at + timedelta(
+                        minutes=second.duration_minutes
+                    )
+                    tasks = (
+                        f"{describe(pet, first, first_end)}, "
+                        f"{describe(pet, second, second_end)}"
+                    )
+                    found.append((second.scheduled_at, pet.name, tasks))
+        found.sort(key=lambda item: (item[0], item[1]))
+        return [f"Conflict at {when:%Y-%m-%d %H:%M}: {tasks}" for when, _, tasks in found]
 
     def mark_task_complete(self, pet: Pet, task: Task) -> Optional[Task]:
         """Complete a pet's task and return its next occurrence, if any."""
@@ -150,7 +183,7 @@ class Scheduler:
         )
 
     def explain_plan(self, day: date) -> str:
-        """Explain the day's ordering, priority labels, and exact-time conflicts."""
+        """Explain the day's ordering, priority labels, and same-pet overlaps."""
         entries = self.get_daily_schedule(day)
         if not entries:
             return f"Plan for {day:%Y-%m-%d}\nNo tasks are scheduled for this day."
@@ -169,8 +202,8 @@ class Scheduler:
         conflicts = self.detect_conflicts(entries)
         lines.append("")
         if conflicts:
-            lines.append("Exact-time conflicts (pending tasks only):")
+            lines.append("Conflicts (overlapping pending tasks for the same pet):")
             lines.extend(f"  - {warning}" for warning in conflicts)
         else:
-            lines.append("No exact-time conflicts detected.")
+            lines.append("No overlapping tasks detected for the same pet.")
         return "\n".join(lines)
