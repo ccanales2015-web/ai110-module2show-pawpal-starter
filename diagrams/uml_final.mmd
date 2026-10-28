@@ -45,7 +45,7 @@ classDiagram
 
     Owner "1" o-- "0..*" Pet : owns
     Pet "1" *-- "0..*" Task : has
-    Scheduler "1" --> "1" Owner : schedules for
+    Scheduler "0..*" --> "1" Owner : schedules for
 
     note for Task "frequency: none | daily | weekly\npriority: low | medium | high\nduration_minutes: positive int (bool rejected)\n__post_init__ raises ValueError (case-sensitive)\nnext_occurrence: none -> None, daily +1 day, weekly +7 days"
-    note for Scheduler "mark_task_complete: ValueError if task not in pet.tasks (identity);\nalready completed -> returns None, no changes\ndetect_conflicts: pending tasks of the same pet only;\neach task spans scheduled_at to scheduled_at + duration_minutes (end exclusive);\noverlapping pairs warn, back-to-back tasks do not\nget_daily_schedule: completed + pending, chronological"
+    note for Scheduler "sort_by_time: new list ordered by scheduled_at (stable; input unchanged)\nfilter_tasks: exact pet name and/or completed; None skips that filter; not sorted\nmark_task_complete: marks task complete; daily/weekly -> next occurrence added to same pet and returned, none -> None;\nValueError if task not in pet.tasks (identity);\nalready completed -> returns None, no changes\ndetect_conflicts: pending tasks of the same pet only;\neach task spans scheduled_at to scheduled_at + duration_minutes (end exclusive);\noverlapping pairs warn, back-to-back tasks do not\nget_daily_schedule: completed + pending, chronological"

@@ -50,7 +50,7 @@ streamlit run app.py
 
 ## 🖥️ Sample Output
 
-Output of `python main.py`, which builds one owner, two pets, and five tasks for October 27, 2026, then demonstrates chronological sorting and filtering by pet and completion status:
+Output of `python main.py`, which builds one owner, two pets, and five tasks for October 27, 2026, then demonstrates conflict detection, completing a daily task and scheduling its next occurrence, chronological sorting, and filtering by pet and completion status:
 
 ```text
 === Initial schedule ===
@@ -144,9 +144,9 @@ All 12 tests pass, and they exercise the core scheduling behaviors and their mai
 Follow these steps in the Streamlit app:
 
 1. **Add a pet.** Under **Owner and Pet Management**, enter a **Pet name**, choose a **Species**, and click **Add pet**. The pet should appear in the **Current pets** table.
-2. **Create tasks with durations.** Under **Tasks**, choose the **Pet**, enter a **Task title**, **Date**, and **Time**, choose a **Frequency** and **Priority**, set **Duration (minutes)** (1–240; default 20), and click **Add task**. To see a conflict, add another task for the same pet that starts before the first task ends. Both tasks should appear in **Current tasks**.
-3. **Generate a schedule and review conflicts.** Under **Build Schedule**, choose the **Schedule date** and click **Generate schedule**. The plan lists that day's tasks in time order and reports any overlapping pending tasks for the same pet, or states that no such overlaps were detected.
+2. **Create tasks with durations.** Under **Tasks**, choose the **Pet**, enter a **Task title**, **Date**, and **Time**, choose a **Frequency** and **Priority**, set **Duration (minutes)** (1–240; default 20), and click **Add task**. To see a conflict, add another task for the same pet that starts before the first task ends. Both tasks should appear in **Current tasks**, which lists all tasks in time order.
+3. **Generate a schedule and review conflicts.** Under **Build Schedule**, choose the **Schedule date** and click **Generate schedule**. If pending tasks for the same pet overlap, a warning banner shows how many conflicts were found, followed by one line per conflict naming both tasks, the pet, and their time ranges. If the day has tasks but no conflicts, a success banner says no overlaps were detected. A table below the banner lists that day's tasks in time order. If no tasks are scheduled for the selected date, an info message says so instead.
 4. **Mark a task complete.** Choose a task from the **Pending task** dropdown and click **Mark complete**. A confirmation appears and the task's status changes to `completed` in the **Current tasks** table. Completing a daily or weekly task also adds its next occurrence as a new pending task.
-5. **Regenerate the schedule.** Click **Generate schedule** again to view the updated plan. Completed tasks are no longer checked for conflicts.
+5. **Regenerate the schedule.** Click **Generate schedule** again to view the updated plan. Completed tasks are no longer checked for conflicts, so completing one task in an overlapping pair clears that conflict.
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->

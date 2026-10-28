@@ -10,12 +10,13 @@ st.title("🐾 PawPal+")
 
 st.markdown(
     """
-Welcome to the PawPal+ starter app.
+Welcome to PawPal+.
 
-This file is intentionally thin. It gives you a working Streamlit app so you can start quickly,
-but **it does not implement the project logic**. Your job is to design the system and build it.
+PawPal+ helps you plan care tasks for your pets. It sorts tasks chronologically,
+**warns you when pending tasks for the same pet overlap**, and schedules the next occurrence
+of daily and weekly tasks when you mark them complete.
 
-Use this app as your interactive demo once your backend classes/functions exist.
+Add your pets and their tasks below, then build a time-ordered schedule for any day.
 """
 )
 
@@ -125,7 +126,9 @@ if pending:
         else:
             st.success(f"Completed {done_task.description}.")
 
-all_tasks = st.session_state.owner.get_all_tasks()
+all_tasks = Scheduler(st.session_state.owner).sort_by_time(
+    st.session_state.owner.get_all_tasks()
+)
 if all_tasks:
     st.write("Current tasks:")
     st.table(
@@ -156,4 +159,34 @@ st.caption(
 schedule_date = st.date_input("Schedule date", value=date.today())
 
 if st.button("Generate schedule"):
-    st.text(Scheduler(st.session_state.owner).explain_plan(schedule_date))
+    scheduler = Scheduler(st.session_state.owner)
+    day_entries = scheduler.get_daily_schedule(schedule_date)
+    if not day_entries:
+        st.info(f"No tasks are scheduled for {schedule_date:%Y-%m-%d}.")
+    else:
+        conflicts = scheduler.detect_conflicts(day_entries)
+        if conflicts:
+            st.warning(
+                f"{len(conflicts)} scheduling conflict(s) found: these pending tasks "
+                "overlap for the same pet. Consider moving one of them."
+            )
+            st.markdown("\n".join(f"- {warning}" for warning in conflicts))
+        else:
+            st.success("No overlapping tasks detected for the same pet.")
+        st.caption(
+            "Tasks are listed in order of scheduled time. "
+            "Priority labels are informational and do not change the order."
+        )
+        st.table(
+            [
+                {
+                    "time": f"{task.scheduled_at:%H:%M}",
+                    "pet": pet.name,
+                    "task": task.description,
+                    "duration_minutes": task.duration_minutes,
+                    "priority": task.priority,
+                    "status": "completed" if task.completed else "pending",
+                }
+                for pet, task in day_entries
+            ]
+        )

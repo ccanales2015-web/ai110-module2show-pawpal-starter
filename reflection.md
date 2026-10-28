@@ -48,9 +48,17 @@ One tradeoff in my scheduler is that it reports scheduling conflicts as warnings
 
 I used AI as a collaborator throughout the project rather than accepting large code changes without review. We worked in small steps: proposing changes, reviewing the diffs, approving specific edits, and running tests to verify the results. The most helpful use of AI was developing targeted tests for scheduling behavior and interpreting the results. For example, we added tests for overlapping tasks, back-to-back tasks, recurring tasks, and attempts to complete a task assigned to the wrong pet. This incremental approach helped me verify individual behaviors and catch potential problems before moving on to the next step.
 
+The assistant features I found most effective were its ability to read several project files and compare them against one another, its read-only reviews that identified discrepancies before any edits were made, and its diff previews, which allowed me to approve or adjust each change before it was applied. Running `python -m pytest` and `git diff --check` after each change also gave me immediate evidence that the work was correct.
+
 **b. Judgment and verification**
 
 One moment when I did not accept an AI suggestion without evaluating it was when we considered simplifying the scheduler's conflict-detection algorithm. The alternative was easier to follow in some respects, but it would compare every pair of tasks and could change the order in which conflicts were reported. I evaluated the suggestion by comparing the readability and efficiency of both approaches and considering its effects on the existing tests, README, and UML diagram. I decided to keep the existing implementation because it was already tested, efficient for the intended use, and consistent with the documented behavior. This reinforced the importance of evaluating AI suggestions rather than assuming that a proposed simplification is necessarily an improvement.
+
+**c. Organizing the work and leading the design**
+
+I did not use a separate chat session for every phase of the project. Instead, I organized the work through focused prompts, each with one clear goal and explicit constraints, such as which files could be modified and when to stop for review. I began each step by describing the current commit and test results so that the AI worked from accurate context. We then worked in small steps: the AI proposed a change, I reviewed the diff, approved or adjusted it, and we verified the result by running the tests and checking the changed files. Keeping each discussion focused on a specific task made it easier to maintain context, avoid unrelated changes, and review each decision before proceeding.
+
+This project also showed me that I needed to remain the lead architect while collaborating with AI. The AI could inspect code, propose changes, and run tests quickly, but I decided which changes fit the design. I approved each diff, limited the scope of each task, and rejected or adjusted suggestions that would have added unnecessary complexity or inconsistency. Keeping these decisions with me ensured that the code, tests, UML diagram, and README continued to describe the same system.
 
 ---
 
@@ -58,11 +66,11 @@ One moment when I did not accept an AI suggestion without evaluating it was when
 
 **a. What you tested**
 
-I tested the scheduler's core behaviors using automated pytest tests. These included marking tasks as complete, adding tasks to a pet, detecting overlapping tasks for the same pet, allowing back-to-back tasks, ignoring overlaps between different pets, and excluding completed tasks from conflict detection. I also tested tasks with identical start times, the creation of the next occurrence for daily tasks, the absence of a new occurrence for one-off tasks, rejection of a task belonging to the wrong pet, and repeated completion of an already-completed recurring task. These tests were important because they checked both expected behavior and edge cases that could otherwise lead to incorrect schedules or unintended changes. All 11 tests passed.
+I tested the scheduler's core behaviors using automated pytest tests. These included marking tasks as complete, adding tasks to a pet, detecting overlapping tasks for the same pet, allowing back-to-back tasks, ignoring overlaps between different pets, and excluding completed tasks from conflict detection. I also tested tasks with identical start times, chronological sorting of tasks across different days while keeping each task paired with its pet, the creation of the next occurrence for daily tasks, the absence of a new occurrence for one-off tasks, rejection of a task belonging to the wrong pet, and repeated completion of an already-completed recurring task. These tests were important because they checked both expected behavior and edge cases that could otherwise lead to incorrect schedules or unintended changes. All 12 tests passed.
 
 **b. Confidence**
 
-I am very confident that the current implementation satisfies the requirements we have tested. All 11 automated tests pass, including tests for overlapping task durations, recurring tasks, and invalid completion attempts. The tests cover both normal operations and important edge cases. However, passing tests cannot prove that every possible situation has been handled correctly. With more time, I would test the Streamlit interface more extensively, including how it behaves when users enter invalid data, create many tasks, or schedule tasks that overlap across midnight.
+I am very confident that the current implementation satisfies the requirements we have tested. All 12 automated tests pass, including tests for chronological sorting, overlapping task durations, recurring tasks, and invalid completion attempts. The tests cover both normal operations and important edge cases. However, passing tests cannot prove that every possible situation has been handled correctly. With more time, I would test the Streamlit interface more extensively, including how it behaves when users enter invalid data, create many tasks, or schedule tasks that overlap across midnight.
 
 ---
 
