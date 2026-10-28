@@ -42,7 +42,7 @@ At minimum, your system should:
 
 st.divider()
 
-st.subheader("Quick Demo Inputs (UI only)")
+st.subheader("Owner and Pet Management")
 owner_name = st.text_input("Owner name", value="Jordan")
 if "owner" not in st.session_state:
     st.session_state.owner = Owner(owner_name)
@@ -61,7 +61,7 @@ else:
     st.info("No pets yet. Add one above.")
 
 st.markdown("### Tasks")
-st.caption("Add a few tasks. In your final version, these should feed into your scheduler.")
+st.caption("Add tasks to your pets and manage their schedules.")
 
 if not st.session_state.owner.pets:
     st.info("Add a pet before adding tasks.")
@@ -117,7 +117,7 @@ else:
 st.divider()
 
 st.subheader("Build Schedule")
-st.caption("This button should call your scheduling logic once you implement it.")
+st.caption("Generate a time-ordered plan and identify exact-time conflicts for the selected date.")
 
 schedule_date = st.date_input("Schedule date", value=date.today())
 
